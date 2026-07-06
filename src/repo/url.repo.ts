@@ -1,10 +1,10 @@
 import { shareProtocol } from "node:stream/iter";
 import {pool} from "../config/db";
 
-export async function createUrl(
+export const createUrl = async(
     shortCode:string,
     originalURL:string
-){
+)=>{
     const res= await pool.query(
         `
         INSERT INTO urls
@@ -16,3 +16,17 @@ export async function createUrl(
     );
     return res.rows[0];
 }
+
+export const findByShortCode = async(
+    shortCode: string
+) => {
+    const res= await pool.query(
+        `
+        SELECT * 
+        FROM urls
+        WHERE short_code = $1
+        `,
+        [shortCode]
+    );
+    return res.rows[0];
+};
