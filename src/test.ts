@@ -14,7 +14,7 @@ import {pool} from "./config/db"
 
 // test();
 
-import { createUrl } from "./repo/url_repo";
+import { createUrl } from "./repo/url.repo";
 
 async function test() {
   const url = await createUrl(
