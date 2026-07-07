@@ -28,3 +28,23 @@ export const getOriginalUrl = async(
     const url= await service.getOriginalUrl(shortCode);  
     res.redirect(url.original_url);
 }
+
+export const getUrlStats=async(
+    req: Request<ShortCodeParams>,
+    res:Response
+)=>{
+    const {shortCode}=req.params;
+    const url=await service.getUrlStats(shortCode);
+    console.log("URL:", url);
+    console.log("TYPE:", typeof url);
+    return res.json({
+        success: true,
+        data:{
+            id: url.id,
+            shortCode:url.short_code,
+            originalUrl: url.original_url,
+            clickCount: url.click_count,
+            createdAt: url.created_at
+        }
+    });
+};

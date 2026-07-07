@@ -19,7 +19,7 @@ export const createShortUrl = async(
 export const getOriginalUrl= async(
     shortCode: string
 )=>{
-    const url= repo.findByShortCode(shortCode);
+    const url= await repo.findByShortCode(shortCode);
 
     if(!url){
         throw new AppError(
@@ -27,5 +27,19 @@ export const getOriginalUrl= async(
             404
         );
     }
+    await repo.counter(shortCode);
     return url;
 };
+
+export const getUrlStats=async(
+    shortCode:string
+)=>{
+    const url=await repo.findByShortCode(shortCode);
+    if(!url){
+        throw new AppError(
+            "url not found",
+            404
+        );
+    }
+    return url;
+}

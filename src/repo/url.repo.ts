@@ -44,3 +44,17 @@ export const findByUrl = async(
     );
     return result.rows[0];
 }
+
+export const counter=async(
+    shortCode: string
+)=>{
+    await pool.query(
+        `
+        UPDATE urls
+        SET click_count=click_count+1
+        WHERE short_code=$1
+        `,
+        [shortCode]
+    );
+    
+};
