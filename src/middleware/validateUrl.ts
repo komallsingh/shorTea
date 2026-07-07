@@ -16,5 +16,27 @@ export const validateUrl= (
             )
         );
     }
+    let parsedUrl:URL;
+    try{
+        parsedUrl=new URL(url);
+    }catch{
+        return next(
+            new AppError(
+                "invalid url",
+                400
+            )
+        );
+    }
+    if(
+        parsedUrl.protocol!="http" &&
+        parsedUrl.protocol!="https:"
+    ){
+        return next(
+            new AppError(
+                "Only HTTP/HTTPS URLs are allowed",
+                400
+            )
+        );
+    }
     next();
 };

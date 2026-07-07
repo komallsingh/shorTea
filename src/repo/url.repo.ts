@@ -30,3 +30,17 @@ export const findByShortCode = async(
     );
     return res.rows[0];
 };
+
+export const findByUrl = async(
+    originalUrl:string
+)=>{
+    const result=await pool.query(
+        `
+        SELECT * 
+        FROM urls
+        WHERE original_url=$1
+        `,
+        [originalUrl]
+    );
+    return result.rows[0];
+}

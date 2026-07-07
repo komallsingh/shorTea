@@ -5,8 +5,11 @@ import { AppError } from "../utils/AppError";
 export const createShortUrl = async(
     originalUrl:string
 )=>{
+    const existingurl=await repo.findByUrl(originalUrl);
+    if(existingurl){
+        return existingurl;
+    }
     const shortCode=generateShortCode();
-
     return await repo.createUrl(
         shortCode,
         originalUrl
