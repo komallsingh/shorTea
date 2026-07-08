@@ -1,10 +1,20 @@
 import { generateShortCode } from "../utils/generateShortCode"
 import * as repo from "../repo/url.repo";
 import { AppError } from "../utils/AppError";
+import { checkUrlSafety } from "./spam.service";
 
 export const createShortUrl = async(
     originalUrl:string
 )=>{
+    const safety = await checkUrlSafety(originalUrl);
+
+     if (!safety.safe) {
+      throw new AppError(
+        safety.message,
+        400
+       );
+    }
+
     const existingurl=await repo.findByUrl(originalUrl);
     if(existingurl){
         return existingurl;
