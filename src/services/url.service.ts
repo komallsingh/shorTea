@@ -2,6 +2,8 @@ import { generateShortCode } from "../utils/generateShortCode"
 import * as repo from "../repo/url.repo";
 import { AppError } from "../utils/AppError";
 import { checkUrlSafety } from "./spam.service";
+import { parseUserAgent } from "../utils/userAgent";
+import * as analyticsRepo from "../repo/analytic.repo";
 
 export const createShortUrl = async(
     originalUrl:string
@@ -27,7 +29,8 @@ export const createShortUrl = async(
 };
 
 export const getOriginalUrl= async(
-    shortCode: string
+    shortCode: string,
+    userAgent:string = ""
 )=>{
     const url= await repo.findByShortCode(shortCode);
 
@@ -38,6 +41,20 @@ export const getOriginalUrl= async(
         );
     }
     await repo.counter(shortCode);
+    const analytics=parseUserAgent(userAgent);
+    try{
+    await analyticsRepo.saveClick(
+        {
+            urlId: url.id,
+            browser: analytics.browser,
+            os:analytics.os,
+            device: analytics.device,
+        }
+    );
+}catch(error){
+    console.error("Failed to savee analytics for ",shortCode,error);
+}
+
     return url;
 };
 

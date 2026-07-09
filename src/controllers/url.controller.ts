@@ -25,7 +25,8 @@ export const getOriginalUrl = async(
     res: Response
 )=>{
     const {shortCode} = req.params;
-    const url= await service.getOriginalUrl(shortCode);  
+    const userAgent=req.get("User-Agent") ?? "";
+    const url= await service.getOriginalUrl(shortCode,userAgent);  
     res.redirect(url.original_url);
 }
 

@@ -14,7 +14,8 @@
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "nanoid": "^5.1.16",
-    "pg": "^8.22.0"
+    "pg": "^8.22.0",
+    "ua-parser-js": "^2.0.10"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
