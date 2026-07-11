@@ -1,5 +1,6 @@
 import * as service from "../services/url.service";
 import { Request, Response } from "express";
+import * as analyticsService from "../services/analytics.service";
 
 interface ShortCodeParams {
   shortCode: string;
@@ -47,5 +48,21 @@ export const getUrlStats=async(
             clickCount: url.click_count,
             createdAt: url.created_at
         }
+    });
+};
+
+export const getBrowserStats = async (
+    req: Request<ShortCodeParams>,
+    res: Response
+) => {
+    const { shortCode } = req.params;
+
+    const browserStats = await analyticsService.getBrowserStats(
+        shortCode
+    );
+
+    return res.json({
+        success: true,
+        data: browserStats,
     });
 };
