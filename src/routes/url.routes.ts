@@ -1,14 +1,15 @@
 import {Router} from "express";
 import {createShortUrl, getOriginalUrl, getBrowserStats} from "../controllers/url.controller";
 import { asyncHandler } from "../middleware/asyncHandler";
-import { validateUrl } from "../middleware/validateUrl";
 import { getUrlStats } from "../controllers/url.controller";
 import { authMiddleware } from "../middleware/auth.middleware";
+import { createUrlSchema } from "../validation/url.validation";
+import { validate } from "../middleware/validate";
 const router=Router();
 
 router.post("/shorten",
     authMiddleware,
-    validateUrl,
+    validate(createUrlSchema),
     asyncHandler(createShortUrl)
 );
 
