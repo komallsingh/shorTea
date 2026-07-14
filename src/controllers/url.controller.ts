@@ -11,8 +11,9 @@ export const createShortUrl = async(
     req: Request,res: Response
 )=>{
     const {url} = req.body;
-    const result= await service.createShortUrl(url);
-
+    const userId = req.user.id;
+    const result= await service.createShortUrl(url,userId);
+    
     res.status(201).json(
         {
             success: true,
@@ -36,7 +37,8 @@ export const getUrlStats=async(
     res:Response
 )=>{
     const {shortCode}=req.params;
-    const url=await service.getUrlStats(shortCode);
+    const userId = req.user.id;
+    const url=await service.getUrlStats(shortCode, userId);
     console.log("URL:", url);
     console.log("TYPE:", typeof url);
     return res.json({
@@ -56,9 +58,9 @@ export const getBrowserStats = async (
     res: Response
 ) => {
     const { shortCode } = req.params;
-
+    const userId = req.user.id;
     const browserStats = await analyticsService.getBrowserStats(
-        shortCode
+        shortCode,userId
     );
 
     return res.json({

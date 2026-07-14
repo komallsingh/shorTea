@@ -1,24 +1,18 @@
 import * as urlRepo from "../repo/url.repo";
 import * as analyticsRepo from "../repo/analytic.repo";
 import { AppError } from "../utils/AppError";
+import { getOwnedUrl } from "./authorization.service";
 
 export const getBrowserStats = async (
-    shortCode: string
+    shortCode: string,
+    userId: number
 ) => {
-    // Find the URL first
-    const url = await urlRepo.findByShortCode(shortCode);
-
-    if (!url) {
-        throw new AppError(
-            "URL not found",
-            404
-        );
-    }
-
-    // Fetch browser statistics
-    const browserStats = await analyticsRepo.getBrowserStats(
-        url.id
+    const url = await getOwnedUrl(
+        shortCode,
+        userId
     );
 
-    return browserStats;
+    return await analyticsRepo.getBrowserStats(
+        url.id
+    );
 };

@@ -4,9 +4,10 @@ import { AppError } from "../utils/AppError";
 import { checkUrlSafety } from "./spam.service";
 import { parseUserAgent } from "../utils/userAgent";
 import * as analyticsRepo from "../repo/analytic.repo";
-
+import { getOwnedUrl } from "./authorization.service";
 export const createShortUrl = async(
-    originalUrl:string
+    originalUrl:string,
+    userId:number
 )=>{
     const safety = await checkUrlSafety(originalUrl);
 
@@ -17,16 +18,18 @@ export const createShortUrl = async(
        );
     }
 
-    const existingurl=await repo.findByUrl(originalUrl);
+    const existingurl=await repo.findByUrlAndUser(originalUrl, userId);
     if(existingurl){
         return existingurl;
     }
     const shortCode=generateShortCode();
     return await repo.createUrl(
         shortCode,
-        originalUrl
+        originalUrl,  
+        userId  
     );
 };
+
 
 export const getOriginalUrl= async(
     shortCode: string,
@@ -58,15 +61,12 @@ export const getOriginalUrl= async(
     return url;
 };
 
-export const getUrlStats=async(
-    shortCode:string
-)=>{
-    const url=await repo.findByShortCode(shortCode);
-    if(!url){
-        throw new AppError(
-            "url not found",
-            404
-        );
-    }
-    return url;
-}
+export const getUrlStats = async (
+    shortCode: string,
+    userId: number
+) => {
+    return await getOwnedUrl(
+        shortCode,
+        userId
+    );
+};
