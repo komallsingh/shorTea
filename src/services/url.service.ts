@@ -5,6 +5,8 @@ import { checkUrlSafety } from "./spam.service";
 import { parseUserAgent } from "../utils/userAgent";
 import * as analyticsRepo from "../repo/analytic.repo";
 import { getOwnedUrl } from "./authorization.service";
+
+
 export const createShortUrl = async(
     originalUrl:string,
     userId:number
@@ -84,3 +86,38 @@ export const deleteMyUrl=async(
     await getOwnedUrl(shortCode,userId);
     return await repo.deleteUrl(shortCode);
 }
+
+export const updateMyUrl=async(
+    shortCode: string,
+    originalUrl: string,
+    userId: number
+) =>{
+    const url=await getOwnedUrl(shortCode,userId);
+    
+    if( url.original_url===originalUrl){
+        throw new AppError(
+            "New URL must be different from current URL",
+            400
+        );
+    }
+    const existing=await repo.findByUrlAndUser(originalUrl,userId);
+    if(existing){
+        return {
+            alreadyExists:true,
+            url: existing
+        };
+    }
+
+    const check=await checkUrlSafety(originalUrl);
+    if(!check.safe){
+        throw new AppError(
+            check.message,
+            400
+        );
+    }
+    const updated=await repo.updateUrl(shortCode,originalUrl);
+    return {
+        alreadyExist: false,
+        url: updated,
+    };
+};

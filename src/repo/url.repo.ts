@@ -108,3 +108,20 @@ export const deleteUrl=async(
         `,[shortCode]
     );
 };
+
+export const updateUrl=async(
+    shortCode:string,
+    originalUrl:string
+)=>{
+    const result = await pool.query(
+        `
+        UPDATE urls
+        SET original_url = $1
+        WHERE short_code = $2
+        RETURNING *
+        `,
+        [originalUrl, shortCode]
+    );
+
+    return result.rows[0]; 
+};

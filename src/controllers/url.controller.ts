@@ -95,3 +95,30 @@ export const deleteMyUrl=async(
         message:"URL deleted successfully"
 });
 };
+
+export const updateMyUrl=async(
+    req: Request<ShortCodeParams>,
+    res: Response
+)=>{
+    const {shortCode}=req.params;
+    const {url}=req.body;
+    const userId=req.user.id;
+    const result= await service.updateMyUrl(
+        shortCode,
+        url,
+        userId
+    );
+
+    if(result.alreadyExists){
+        return res.status(200).json({
+            success: true,
+            message: "This URL already exists.",
+            data: result.url,
+        }); 
+    }
+    return res.status(200).json({
+        success: true,
+        message: "URL updated successfully.",
+        data: result.url,
+    });
+}
