@@ -76,8 +76,22 @@ export const getMyUrls= async(
 )=>{
     const userId=req.user.id;
     const urls= await service.getMyUrls(userId);
-    return res.json({
+    return res.status(200).json({
         success:true,
         data: urls,
     });
+};
+
+export const deleteMyUrl=async(
+    req:Request<ShortCodeParams>,
+    res:Response
+)=>{
+    const {shortCode}=req.params;
+    const userId=req.user.id;
+
+    await service.deleteMyUrl(shortCode,userId);
+    return res.status(200).json({
+        success:true,
+        message:"URL deleted successfully"
+});
 };

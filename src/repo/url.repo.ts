@@ -97,3 +97,14 @@ export const findAllByUser=async(
     );
     return result.rows;
 }
+
+export const deleteUrl=async(
+    shortCode: string
+)=>{
+    await pool.query(
+        `
+        DELETE FROM urls
+        WHERE short_code=$1
+        `,[shortCode]
+    );
+};

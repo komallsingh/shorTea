@@ -76,3 +76,11 @@ export const getMyUrls=async (
 )=>{
     return await repo.findAllByUser(userId);
 };
+
+export const deleteMyUrl=async(
+    shortCode:string,
+    userId:number
+)=>{
+    await getOwnedUrl(shortCode,userId);
+    return await repo.deleteUrl(shortCode);
+}
