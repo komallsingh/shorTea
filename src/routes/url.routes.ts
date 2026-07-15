@@ -1,7 +1,6 @@
 import {Router} from "express";
-import {createShortUrl, getOriginalUrl, getBrowserStats} from "../controllers/url.controller";
+import {createShortUrl, getOriginalUrl, getBrowserStats, getUrlStats, getMyUrls} from "../controllers/url.controller";
 import { asyncHandler } from "../middleware/asyncHandler";
-import { getUrlStats } from "../controllers/url.controller";
 import { authMiddleware } from "../middleware/auth.middleware";
 import { createUrlSchema } from "../validation/url.validation";
 import { validate } from "../middleware/validate";
@@ -11,6 +10,12 @@ router.post("/shorten",
     authMiddleware,
     validate(createUrlSchema),
     asyncHandler(createShortUrl)
+);
+
+router.get(
+    "/my-urls",
+    authMiddleware,
+    asyncHandler(getMyUrls)
 );
 
 router.get("/stats/:shortCode", 

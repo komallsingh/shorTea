@@ -77,3 +77,23 @@ export const findByShortCodeAndUser=async(
     );
     return result.rows[0];
 }
+
+export const findAllByUser=async(
+    userId: number
+)=>{
+    const result=await pool.query(
+        `
+        SELECT 
+        id,
+        short_code,
+        original_url,
+        click_count,
+        TO_CHAR(created_at, 'DD Mon YYYY, HH12:MI AM') AS creation_data
+        FROM urls
+        WHERE user_id = $1
+        ORDER BY created_at DESC
+        `,
+        [userId]
+    );
+    return result.rows;
+}

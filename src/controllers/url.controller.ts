@@ -1,6 +1,7 @@
 import * as service from "../services/url.service";
 import { Request, Response } from "express";
 import * as analyticsService from "../services/analytics.service";
+import { success } from "zod";
 
 interface ShortCodeParams {
   shortCode: string;
@@ -66,5 +67,17 @@ export const getBrowserStats = async (
     return res.json({
         success: true,
         data: browserStats,
+    });
+};
+
+export const getMyUrls= async(
+    req:Request,
+    res:Response
+)=>{
+    const userId=req.user.id;
+    const urls= await service.getMyUrls(userId);
+    return res.json({
+        success:true,
+        data: urls,
     });
 };

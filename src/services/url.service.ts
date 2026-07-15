@@ -70,3 +70,9 @@ export const getUrlStats = async (
         userId
     );
 };
+
+export const getMyUrls=async (
+    userId:number
+)=>{
+    return await repo.findAllByUser(userId);
+};
