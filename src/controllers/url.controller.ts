@@ -77,7 +77,10 @@ export const getMyUrls= async(
     const userId=req.user.id;
     const page=Number(req.query.page) || 1;
     const limit=Number(req.query.limit) || 10;
-    const result= await service.getMyUrls(userId, page, limit);
+    const search = String(req.query.search ?? "");
+    const sort = String(req.query.sort ?? "date");
+    const order = String(req.query.order ?? "desc");
+    const result= await service.getMyUrls(userId, page, limit, search, sort, order);
     return res.status(200).json({
         success:true,
         data: result.urls,

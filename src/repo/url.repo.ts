@@ -81,8 +81,12 @@ export const findByShortCodeAndUser=async(
 export const findAllByUser=async(
     userId: number,
     limit: number,
-    offset: number
+    offset: number,
+    search: string,
+    sortColumn: string,
+    sortOrder: string
 )=>{
+    const searchPattern = `%${search}%`;
     const result=await pool.query(
         `
         SELECT 
@@ -92,11 +96,17 @@ export const findAllByUser=async(
         click_count,
         TO_CHAR(created_at, 'DD Mon YYYY, HH12:MI AM') AS creation_data
         FROM urls
-        WHERE user_id = $1
-        ORDER BY created_at DESC
-        LIMIT $2 OFFSET $3
+        WHERE
+            user_id = $1
+            AND (
+            original_url ILIKE $2
+            OR short_code ILIKE $2
+            )
+        ORDER BY ${sortColumn} ${sortOrder}
+        LIMIT $3
+        OFFSET $4
         `,
-        [userId, limit, offset]
+        [userId,searchPattern,limit,offset]
     );
     return result.rows;
 }
@@ -130,15 +140,17 @@ export const updateUrl=async(
 };
 
 export const countUrlsByUser=async(
-    userId:number
+    userId:number,
+    search:string
 )=>{
+    const searchPattern = `%${search}%`;
     const result=await pool.query(
         `
         SELECT COUNT(*) AS total
         FROM urls
-        WHERE user_id=$1
+        WHERE user_id=$1 AND (original_url ILIKE $2 OR short_code ILIKE $2)
         `,
-        [userId]
+        [userId, searchPattern]
     );
     return Number(result.rows[0].total);
 }

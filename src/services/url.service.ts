@@ -76,13 +76,23 @@ export const getUrlStats = async (
 export const getMyUrls = async (
     userId: number,
     page: number,
-    limit: number
+    limit: number,
+    search: string,
+    sort: string,
+    order: string
 ) => {
     const offset = (page - 1) * limit;
-
+    const sortColumn =
+    sort === "clicks"
+        ? "click_count"
+        : "created_at";
+    const sortOrder =
+    order.toLowerCase() === "asc"
+        ? "ASC"
+        : "DESC";
     const [urls, totalRecords] = await Promise.all([
-        repo.findAllByUser(userId, limit, offset),
-        repo.countUrlsByUser(userId)
+        repo.findAllByUser(userId, limit, offset,search, sortColumn, sortOrder),
+        repo.countUrlsByUser(userId,search)
     ]);
 
     const totalPages = Math.ceil(totalRecords / limit);
