@@ -3,7 +3,7 @@ import { success } from "zod";
 
 export const rateLimiter= rateLimit({
     windowMs: 15*60*1000, //15 mins
-    limit: 5, //max 100 req per IP
+    limit: 100, //max 100 req per IP
     standardHeaders: true,
     legacyHeaders: false,
     message:{
