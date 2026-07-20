@@ -75,10 +75,13 @@ export const getMyUrls= async(
     res:Response
 )=>{
     const userId=req.user.id;
-    const urls= await service.getMyUrls(userId);
+    const page=Number(req.query.page) || 1;
+    const limit=Number(req.query.limit) || 10;
+    const result= await service.getMyUrls(userId, page, limit);
     return res.status(200).json({
         success:true,
-        data: urls,
+        data: result.urls,
+        pagination: result.pagination
     });
 };
 

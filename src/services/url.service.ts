@@ -73,10 +73,31 @@ export const getUrlStats = async (
     );
 };
 
-export const getMyUrls=async (
-    userId:number
-)=>{
-    return await repo.findAllByUser(userId);
+export const getMyUrls = async (
+    userId: number,
+    page: number,
+    limit: number
+) => {
+    const offset = (page - 1) * limit;
+
+    const [urls, totalRecords] = await Promise.all([
+        repo.findAllByUser(userId, limit, offset),
+        repo.countUrlsByUser(userId)
+    ]);
+
+    const totalPages = Math.ceil(totalRecords / limit);
+
+    return {
+        urls,
+        pagination: {
+            page,
+            limit,
+            totalRecords,
+            totalPages,
+            hasNext: page < totalPages,
+            hasPrevious: page > 1
+        }
+    };
 };
 
 export const deleteMyUrl=async(

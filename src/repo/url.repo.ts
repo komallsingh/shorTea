@@ -79,7 +79,9 @@ export const findByShortCodeAndUser=async(
 }
 
 export const findAllByUser=async(
-    userId: number
+    userId: number,
+    limit: number,
+    offset: number
 )=>{
     const result=await pool.query(
         `
@@ -92,8 +94,9 @@ export const findAllByUser=async(
         FROM urls
         WHERE user_id = $1
         ORDER BY created_at DESC
+        LIMIT $2 OFFSET $3
         `,
-        [userId]
+        [userId, limit, offset]
     );
     return result.rows;
 }
@@ -125,3 +128,17 @@ export const updateUrl=async(
 
     return result.rows[0]; 
 };
+
+export const countUrlsByUser=async(
+    userId:number
+)=>{
+    const result=await pool.query(
+        `
+        SELECT COUNT(*) AS total
+        FROM urls
+        WHERE user_id=$1
+        `,
+        [userId]
+    );
+    return Number(result.rows[0].total);
+}
