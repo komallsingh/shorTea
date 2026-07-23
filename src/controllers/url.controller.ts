@@ -14,13 +14,18 @@ export const createShortUrl = async(
     const {url, customAlias} = req.body;
     const userId = req.user.id;
     const result= await service.createShortUrl(url,userId,customAlias);
-    
-    res.status(201).json(
-        {
-            success: true,
-            data: result
-        }
-    );
+    if (result.alreadyExists) {
+    return res.status(200).json({
+        success: true,
+        message: "This URL already exists.",
+        data: result.url
+    });
+}
+    return res.status(201).json({
+    success: true,
+    message: "URL created successfully.",
+    data: result.url
+   });
 };
 
 export const getOriginalUrl = async(

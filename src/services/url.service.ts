@@ -35,7 +35,10 @@ export const createShortUrl = async(
 
     const existingurl=await repo.findByUrlAndUser(originalUrl, userId);
     if(existingurl){
-        return existingurl;
+        return {
+            alreadyExists: true,
+            url: existingurl
+        };
     }
 
     const alias = customAlias?.trim();
@@ -85,11 +88,16 @@ export const createShortUrl = async(
         );
 
     }
-    return await repo.createUrl(
-        shortCode,
-        originalUrl,  
-        userId  
-    );
+    const created = await repo.createUrl(
+    shortCode,
+    originalUrl,
+    userId
+);
+
+return {
+    alreadyExists: false,
+    url: created
+};
 };
 
 
