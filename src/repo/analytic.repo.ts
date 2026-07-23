@@ -10,6 +10,10 @@ export interface BrowserStat {
     browser: string;
     count: number;
 }
+export interface DailyClickStat {
+    day: string;
+    count: number;
+}
 
 
 export const saveClick=async (
@@ -52,5 +56,28 @@ export const getBrowserStats = async (
     return result.rows.map(row => ({
         browser: row.browser,
         count: Number(row.count),
+    }));
+};
+
+export const getDailyClickStats = async (
+    urlId: number
+): Promise<DailyClickStat[]> => {
+
+    const result = await pool.query(
+    `
+    SELECT
+        TO_CHAR(clicked_at, 'YYYY-MM-DD') AS day,
+        COUNT(*) AS count
+    FROM url_clicks
+    WHERE url_id = $1
+    GROUP BY TO_CHAR(clicked_at, 'YYYY-MM-DD')
+    ORDER BY TO_CHAR(clicked_at, 'YYYY-MM-DD')
+    `,
+    [urlId]
+);
+
+    return result.rows.map(row => ({
+        day: row.day,
+        count: Number(row.count)
     }));
 };

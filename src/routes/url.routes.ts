@@ -1,8 +1,9 @@
 import {Router} from "express";
 import {createShortUrl, getOriginalUrl, 
     getBrowserStats, getUrlStats, 
-    getMyUrls, deleteMyUrl, updateMyUrl} from "../controllers/url.controller";
-import { asyncHandler } from "../middleware/asyncHandler";
+    getMyUrls, deleteMyUrl, updateMyUrl,
+    getDailyAnalytics} from "../controllers/url.controller";
+import { asyncHandler} from "../middleware/asyncHandler";
 import { authMiddleware } from "../middleware/auth.middleware";
 import { createUrlSchema } from "../validation/url.validation";
 import { validate } from "../middleware/validate";
@@ -29,6 +30,12 @@ router.get(
     "/stats/:shortCode/browser",
     authMiddleware,
     asyncHandler(getBrowserStats)
+);
+
+router.get(
+    "/stats/:shortCode/daily",
+    authMiddleware,
+    asyncHandler(getDailyAnalytics)
 );
 
 router.delete(

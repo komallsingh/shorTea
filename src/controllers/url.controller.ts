@@ -136,3 +136,22 @@ export const updateMyUrl=async(
     });
 }
 
+export const getDailyAnalytics = async (
+    req: Request<ShortCodeParams>,
+    res: Response
+) => {
+
+    const { shortCode } = req.params;
+    const userId = req.user.id;
+
+    const data = await analyticsService.getDailyAnalytics(
+        shortCode,
+        userId
+    );
+
+    return res.json({
+        success: true,
+        data
+    });
+
+};

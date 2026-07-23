@@ -16,3 +16,19 @@ export const getBrowserStats = async (
         url.id
     );
 };
+
+export const getDailyAnalytics = async (
+    shortCode: string,
+    userId: number
+) => {
+
+    const url = await getOwnedUrl(
+        shortCode,
+        userId
+    );
+
+    return await analyticsRepo.getDailyClickStats(
+        url.id
+    );
+
+};
