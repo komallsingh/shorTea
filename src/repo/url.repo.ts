@@ -124,16 +124,19 @@ export const deleteUrl=async(
 
 export const updateUrl=async(
     shortCode:string,
-    originalUrl:string
+    originalUrl:string,
+    newAlias:string|undefined,
 )=>{
     const result = await pool.query(
         `
         UPDATE urls
-        SET original_url = $1
-        WHERE short_code = $2
-        RETURNING *
+        SET
+        original_url = $1,
+        short_code = $2
+        WHERE short_code = $3
+        RETURNING *;
         `,
-        [originalUrl, shortCode]
+        [originalUrl, newAlias, shortCode]
     );
 
     return result.rows[0]; 

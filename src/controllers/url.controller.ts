@@ -11,9 +11,9 @@ interface ShortCodeParams {
 export const createShortUrl = async(
     req: Request,res: Response
 )=>{
-    const {url} = req.body;
+    const {url, customAlias} = req.body;
     const userId = req.user.id;
-    const result= await service.createShortUrl(url,userId);
+    const result= await service.createShortUrl(url,userId,customAlias);
     
     res.status(201).json(
         {
@@ -107,12 +107,13 @@ export const updateMyUrl=async(
     res: Response
 )=>{
     const {shortCode}=req.params;
-    const {url}=req.body;
+    const {url,customAlias}=req.body;
     const userId=req.user.id;
     const result= await service.updateMyUrl(
         shortCode,
         url,
-        userId
+        customAlias,
+        userId 
     );
 
     if(result.alreadyExists){

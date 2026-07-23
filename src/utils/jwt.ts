@@ -15,11 +15,10 @@ export const generateToken = (
         throw new Error("JWT_SECRETKEY is not configured");
     }
 
-    console.log("========== JWT GENERATION ==========");
+
     console.log("SECRET:", secret);
     console.log("USER ID:", userId);
     console.log("EXPIRES:", process.env.JWT_EXPIRES_IN ?? "1d");
-    console.log("====================================");
 
     const expiresIn =
         (process.env.JWT_EXPIRES_IN ?? "1d") as jwt.SignOptions["expiresIn"];

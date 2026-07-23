@@ -7,9 +7,22 @@ import * as analyticsRepo from "../repo/analytic.repo";
 import { getOwnedUrl } from "./authorization.service";
 
 
+const RESERVED_ALIASES = [
+    "api",
+    "auth",
+    "login",
+    "register",
+    "dashboard",
+    "profile"
+];
+
+const isValidAlias = (alias: string) =>
+    /^[a-zA-Z0-9_-]{3,20}$/.test(alias);
+
 export const createShortUrl = async(
     originalUrl:string,
-    userId:number
+    userId:number,
+    customAlias?:string
 )=>{
     const safety = await checkUrlSafety(originalUrl);
 
@@ -24,7 +37,54 @@ export const createShortUrl = async(
     if(existingurl){
         return existingurl;
     }
-    const shortCode=generateShortCode();
+
+    const alias = customAlias?.trim();
+
+    let shortCode: string;
+
+    if (alias) {
+
+        if (!isValidAlias(alias)) {
+            throw new AppError(
+                "Alias must contain only letters, numbers, '-' or '_' and be 3-20 characters long.",
+                400
+            );
+        }
+
+        if (
+            RESERVED_ALIASES.includes(
+                alias.toLowerCase()
+            )
+        ) {
+            throw new AppError(
+                "This alias is reserved.",
+                400
+            );
+        }
+
+        const existingAlias =
+            await repo.findByShortCode(alias);
+
+        if (existingAlias) {
+            throw new AppError(
+                "Alias already exists.",
+                409
+            );
+        }
+
+        shortCode = alias;
+
+    } else {
+
+        do {
+
+            shortCode = generateShortCode();
+
+        } while (
+            await repo.findByShortCode(shortCode)
+        );
+
+    }
     return await repo.createUrl(
         shortCode,
         originalUrl,  
@@ -118,37 +178,115 @@ export const deleteMyUrl=async(
     return await repo.deleteUrl(shortCode);
 }
 
-export const updateMyUrl=async(
+export const updateMyUrl = async (
     shortCode: string,
     originalUrl: string,
+    customAlias: string | undefined,
     userId: number
-) =>{
-    const url=await getOwnedUrl(shortCode,userId);
-    
-    if( url.original_url===originalUrl){
+) => {
+
+    const url = await getOwnedUrl(
+        shortCode,
+        userId
+    );
+
+    const alias = customAlias?.trim();
+
+    if (
+        url.original_url === originalUrl &&
+        (!alias || alias === url.short_code)
+    ) {
         throw new AppError(
-            "New URL must be different from current URL",
+            "Nothing to update",
             400
         );
-    }
-    const existing=await repo.findByUrlAndUser(originalUrl,userId);
-    if(existing){
-        return {
-            alreadyExists:true,
-            url: existing
-        };
     }
 
-    const check=await checkUrlSafety(originalUrl);
-    if(!check.safe){
+    const existingUrl =
+        await repo.findByUrlAndUser(
+            originalUrl,
+            userId
+        );
+
+    if (
+        existingUrl &&
+        existingUrl.id !== url.id
+    ) {
+
+        return {
+            alreadyExists: true,
+            url: existingUrl
+        };
+
+    }
+
+    const safety =
+        await checkUrlSafety(originalUrl);
+
+    if (!safety.safe) {
+
         throw new AppError(
-            check.message,
+            safety.message,
             400
         );
+
     }
-    const updated=await repo.updateUrl(shortCode,originalUrl);
+
+    let finalAlias = url.short_code;
+
+    if (
+        alias &&
+        alias != url.short_code
+    ) {
+
+        if (!isValidAlias(alias)) {
+            throw new AppError(
+                "Invalid alias",
+                400
+            );
+        }
+
+        if (
+            RESERVED_ALIASES.includes(
+                alias.toLowerCase()
+            )
+        ) {
+            throw new AppError(
+                "Alias is reserved",
+                400
+            );
+        }
+
+        const exists =
+            await repo.findByShortCode(alias);
+
+        if (
+            exists &&
+            exists.id != url.id
+        ) {
+            throw new AppError(
+                "Alias already exists",
+                409
+            );
+        }
+
+        finalAlias = alias;
+
+    }
+
+    const updated =
+        await repo.updateUrl(
+            shortCode,
+            originalUrl,
+            finalAlias
+        );
+
     return {
-        alreadyExist: false,
-        url: updated,
+
+        alreadyExists: false,
+
+        url: updated
+
     };
+
 };
