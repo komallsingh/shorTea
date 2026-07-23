@@ -2,6 +2,7 @@ import * as service from "../services/url.service";
 import { Request, Response } from "express";
 import * as analyticsService from "../services/analytics.service";
 import { success } from "zod";
+import { AppError } from "../utils/AppError";
 
 interface ShortCodeParams {
   shortCode: string;
@@ -134,3 +135,4 @@ export const updateMyUrl=async(
         data: result.url,
     });
 }
+

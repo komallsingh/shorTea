@@ -5,7 +5,7 @@ import { checkUrlSafety } from "./spam.service";
 import { parseUserAgent } from "../utils/userAgent";
 import * as analyticsRepo from "../repo/analytic.repo";
 import { getOwnedUrl } from "./authorization.service";
-
+import { generateShortUrl } from "../utils/shortUrl";
 
 const RESERVED_ALIASES = [
     "api",
@@ -37,7 +37,15 @@ export const createShortUrl = async(
     if(existingurl){
         return {
             alreadyExists: true,
-            url: existingurl
+            url: {
+
+            ...existingurl,
+
+            shortUrl: generateShortUrl(
+                existingurl.short_code
+            )
+
+        }
         };
     }
 
@@ -96,7 +104,10 @@ export const createShortUrl = async(
 
 return {
     alreadyExists: false,
-    url: created
+    url: created,
+    shortUrl: generateShortUrl(
+            created.short_code
+        )
 };
 };
 
@@ -162,11 +173,19 @@ export const getMyUrls = async (
         repo.findAllByUser(userId, limit, offset,search, sortColumn, sortOrder),
         repo.countUrlsByUser(userId,search)
     ]);
+    const formattedUrls = urls.map((url)=>({
 
+        ...url,
+
+        shortUrl: generateShortUrl(
+            url.short_code
+        )
+
+    }));
     const totalPages = Math.ceil(totalRecords / limit);
 
     return {
-        urls,
+        urls: formattedUrls,
         pagination: {
             page,
             limit,
@@ -293,8 +312,26 @@ export const updateMyUrl = async (
 
         alreadyExists: false,
 
-        url: updated
+        url:{
+
+        ...updated,
+
+        shortUrl: generateShortUrl(
+            updated.short_code
+        )
+
+    }
 
     };
+
+};
+
+export const getUrlByShortCode = async(
+    shortCode:string
+)=>{
+
+    const url = await repo.findByShortCode(shortCode);
+
+    return url;
 
 };

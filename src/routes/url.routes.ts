@@ -43,9 +43,7 @@ router.patch(
     validate(createUrlSchema),
     asyncHandler(updateMyUrl)
 );
-router.get("/:shortCode",
-    asyncHandler(getOriginalUrl)
-);
+
 
 export default router;
 

@@ -17,6 +17,7 @@ export const generateToken = (
 
 
     console.log("SECRET:", secret);
+    console.log("CURRENT TIME:", new Date().toISOString());
     console.log("USER ID:", userId);
     console.log("EXPIRES:", process.env.JWT_EXPIRES_IN ?? "1d");
 
