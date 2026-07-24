@@ -16,10 +16,12 @@ export const reportBug = async (
         });
     }
 
-    await reportBugService(
+    reportBugService(
         userId,
         message
-    );
+    ).catch(error => {
+        console.error("Bug report email failed:", error);
+    });
 
     return res.status(200).json({
         success: true,
