@@ -1,37 +1,43 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
-const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
-    auth: {
-        user: process.env.MAIL_USER,
-        pass: process.env.MAIL_PASS,
-    },
-    connectionTimeout: 10000,
-    socketTimeout: 10000,
-});
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const sendBugReport = async (
     userEmail: string,
     message: string
 ) => {
 
-    console.log("Starting bug email");
-
-    await transporter.sendMail({
-
-        from: `"shorTea Bug Report" <${process.env.MAIL_USER}>`,
-        to: process.env.MAIL_USER,
-        subject: "New Bug Report - shorTea",
+    const { data, error } = await resend.emails.send({
+        from: "shorTea Bug Report <onboarding@resend.dev>",
+        to: [
+            process.env.BUG_REPORT_EMAIL!
+        ],
+        subject: "New shorTea Bug Report",
 
         html: `
-            <h2>New Bug Report</h2>
-            <p><strong>User:</strong> ${userEmail}</p>
-            <p><strong>Description:</strong></p>
-            <p>${message}</p>
-        `
+            <h2> New Bug Report</h2>
+
+            <p>
+                <strong>User Email:</strong>
+                ${userEmail}
+            </p>
+
+            <p>
+                <strong>Message:</strong>
+            </p>
+
+            <p>
+                ${message}
+            </p>
+        `,
     });
 
-    console.log("Bug email sent");
+
+    if (error) {
+        console.error("Resend error:", error);
+        throw new Error("Failed to send bug report email");
+    }
+
+
+    console.log("Email sent:", data?.id);
 };

@@ -9,6 +9,7 @@ export const reportBug = async (
     const userId = req.user.id;
     const { message } = req.body;
 
+
     if (!message?.trim()) {
         return res.status(400).json({
             success: false,
@@ -16,12 +17,12 @@ export const reportBug = async (
         });
     }
 
-    reportBugService(
+
+    await reportBugService(
         userId,
         message
-    ).catch(error => {
-        console.error("Bug report email failed:", error);
-    });
+    );
+
 
     return res.status(200).json({
         success: true,
