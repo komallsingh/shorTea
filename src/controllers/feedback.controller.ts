@@ -1,22 +1,23 @@
 import { Request, Response } from "express";
-import * as feedbackService from "../services/feedback.service";
+import { reportBugService } from "../services/feedback.service";
 
 export const reportBug = async (
     req: Request,
     res: Response
 ) => {
 
-    const { email, message } = req.body;
+    const userId = req.user.id;
+    const { message } = req.body;
 
-    if (!email || !message) {
+    if (!message?.trim()) {
         return res.status(400).json({
             success: false,
-            message: "Email and message are required."
+            message: "Message is required."
         });
     }
 
-    await feedbackService.reportBug(
-        email,
+    await reportBugService(
+        userId,
         message
     );
 
@@ -24,5 +25,4 @@ export const reportBug = async (
         success: true,
         message: "Bug report submitted successfully."
     });
-
 };
