@@ -79,7 +79,7 @@ https://github.com/komallsingh/shortTea-App
 - [x] Device Analytics
 - [x] Operating System Analytics
 - [x] Bug & Feedback Reporting
-
+- [x] QR Code Generation, Saving and Sharing
 ---
 
 ## 🔐 Authentication & Authorization
@@ -103,7 +103,7 @@ https://github.com/komallsingh/shortTea-App
 - [x] Delete URLs
 - [x] URL Statistics
 - [x] Browser Statistics
-
+- [x] QR Code Generation, Saving and Sharing
 ---
 
 ## 📊 Analytics
@@ -343,7 +343,8 @@ npm run dev
 - Get My URLs
 - Get URL Statistics
 - Get Browser Statistics
-
+- Get QR Codes for each URL
+  
 ## Feedback API
 
 - Submit Bug Report
@@ -352,11 +353,6 @@ npm run dev
 
 ---
 
-# 🚀 Upcoming Features
-
-- QR Code Generation
-
----
 
 <div align="center">
 
