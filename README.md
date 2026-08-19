@@ -80,6 +80,7 @@ https://github.com/komallsingh/shortTea-App
 - [x] Operating System Analytics
 - [x] Bug & Feedback Reporting
 - [x] QR Code Generation, Saving and Sharing
+- [x] Caching using Redis
 ---
 
 ## 🔐 Authentication & Authorization
@@ -128,7 +129,7 @@ A built-in feedback system allows authenticated users to report bugs or submit f
 - [x] Powered by Resend
 - [x] Backend Validation
 - [x] Instant Delivery to Developer Inbox
-
+- [x] Caching for faster responses 
 ---
 
 ## 🛠 API Features
@@ -138,7 +139,7 @@ A built-in feedback system allows authenticated users to report bugs or submit f
 - [x] Sorting
 - [x] Duplicate Detection
 - [x] Clean REST APIs
-
+- [x] Caching 
 ---
 
 ## 🛡 Validation & Error Handling
