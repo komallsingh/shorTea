@@ -6,6 +6,10 @@ import { parseUserAgent } from "../utils/userAgent";
 import * as analyticsRepo from "../repo/analytic.repo";
 import { getOwnedUrl } from "./authorization.service";
 import { generateShortUrl } from "../utils/shortUrl";
+import {
+    getCache,
+    setCache
+} from "../utils/redisCache";   
 
 const RESERVED_ALIASES = [
     "api",
@@ -112,32 +116,69 @@ return {
 };
 
 
-export const getOriginalUrl= async(
+export const getOriginalUrl = async (
     shortCode: string,
-    userAgent:string = ""
-)=>{
-    const url= await repo.findByShortCode(shortCode);
+    userAgent: string = ""
+) => {
 
-    if(!url){
-        throw new AppError(
-            "URL not found",
-            404
+    const cacheKey = `url:${shortCode}`;
+
+    // 1. Check Redis
+    const cachedUrl = await getCache(cacheKey);
+
+    let url;
+
+    if (cachedUrl) {
+
+        console.log("Redis HIT:", shortCode);
+
+        url = JSON.parse(cachedUrl);
+
+    } else {
+
+        console.log("Redis MISS:", shortCode);
+
+        // 2. Fetch from PostgreSQL
+        url = await repo.findByShortCode(shortCode);
+
+        if (!url) {
+            throw new AppError(
+                "URL not found",
+                404
+            );
+        }
+
+        // 3. Store in Redis
+        await setCache(
+            cacheKey,
+            JSON.stringify(url),
+            3600
         );
     }
+
+    // 4. Keep click counting
     await repo.counter(shortCode);
-    const analytics=parseUserAgent(userAgent);
-    try{
-    await analyticsRepo.saveClick(
-        {
+
+    // 5. Keep analytics
+    const analytics = parseUserAgent(userAgent);
+
+    try {
+
+        await analyticsRepo.saveClick({
             urlId: url.id,
             browser: analytics.browser,
-            os:analytics.os,
+            os: analytics.os,
             device: analytics.device,
-        }
-    );
-}catch(error){
-    console.error("Failed to savee analytics for ",shortCode,error);
-}
+        });
+
+    } catch (error) {
+
+        console.error(
+            "Failed to save analytics for",
+            shortCode,
+            error
+        );
+    }
 
     return url;
 };
